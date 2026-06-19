@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>황남대총 통합 검색</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@400;500;700;800;900&family=Noto+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#26345f;--navy2:#33437a;--blue:#5b7cc2;--node:#8fb3ec;
+    --bg:#f5f7fc;--surface:#ffffff;--ink:#1e2535;--muted:#646c80;--line:#e3e7f0;
+    --c-feat:#d6eedf;
+    --maxw:1100px;
+  }
+  *{box-sizing:border-box}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans KR",sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased}
+  h1,h2,h3,h4{font-family:"Gothic A1",sans-serif;line-height:1.18;margin:0}
+  .mono{font-family:"IBM Plex Mono",monospace}
+  ::selection{background:var(--node);color:#fff}
+  :focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:4px}
+  .pad{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+
+  /* 헤더 */
+  .head{background:linear-gradient(135deg,#2b3c6d,#3f5694 55%,#4a63a8);color:#fff}
+  .head .pad{padding:44px 28px 40px}
+  .head .ey{font-family:"IBM Plex Mono";font-size:13px;letter-spacing:.06em;color:#bcccef;margin-bottom:12px}
+  .head h1{font-weight:900;font-size:clamp(28px,5vw,44px);letter-spacing:-.02em}
+  .head p{margin:14px 0 0;color:#dde6f8;font-size:15px;max-width:620px}
+
+  .sec{padding:44px 0 70px}
+
+  /* 통합 검색 */
+  .search{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:26px;box-shadow:0 6px 24px #26345f0d}
+  .searchbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
+  .searchbar input{flex:1;min-width:230px;border:1.5px solid var(--line);border-radius:12px;padding:13px 16px;font-family:"Noto Sans KR";font-size:15px;background:var(--bg)}
+  .searchbar input:focus{border-color:var(--blue);outline:none;background:#fff}
+  .cnt{font-family:"IBM Plex Mono";font-size:12px;color:var(--muted)}
+  .chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:22px;align-items:center}
+  .flab{font-family:"IBM Plex Mono";font-size:11px;color:#9aa1b3;text-transform:uppercase;margin-right:2px}
+  .chip2{font-family:"IBM Plex Mono";font-size:12px;border:1px solid var(--line);background:#fff;color:var(--muted);padding:6px 12px;border-radius:30px;cursor:pointer;transition:.15s}
+  .chip2:hover{border-color:var(--blue);color:var(--navy)}
+  .chip2.on{background:var(--navy);border-color:var(--navy);color:#fff}
+  .res{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:880px){.res{grid-template-columns:1fr 1fr}}
+  @media(max-width:560px){.res{grid-template-columns:1fr}}
+  .item{border:1px solid var(--line);border-radius:14px;padding:16px;background:#fff;transition:.15s}
+  .item:hover{border-color:var(--blue);box-shadow:0 6px 18px #26345f0f;transform:translateY(-2px)}
+  .item .top2{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+  .pill{font-family:"IBM Plex Mono";font-size:10.5px;padding:3px 8px;border-radius:20px;font-weight:500}
+  .pill.cls{color:#2a3556}
+  .pill.mn{border:1px solid var(--line);color:var(--muted)}
+  .item h4{font-weight:800;font-size:16px;color:var(--navy)}
+  .item .hj{font-family:"IBM Plex Mono";font-size:11px;color:#9aa1b3;margin-left:6px}
+  .item p{color:var(--muted);font-size:13px;margin:8px 0 0}
+  .item .attr{margin-top:11px;padding-top:10px;border-top:1px dashed var(--line);font-family:"IBM Plex Mono";font-size:11px;color:#8089a0;display:flex;flex-wrap:wrap;gap:4px}
+  .item .attr b{color:var(--blue);font-weight:500}
+  .none{grid-column:1/-1;text-align:center;color:var(--muted);padding:40px}
+</style>
+</head>
+<body>
+
+<header class="head">
+  <div class="pad">
+    <div class="ey">황남동 98호분 · 발굴조사보고서 기반</div>
+    <h1>황남대총 통합 검색</h1>
+    <p>“금관”, “부인대”, “봉수형”처럼 하나의 키워드로 연관된 유물·유구를 한 번에 찾고, 무덤·클래스·재질로 좁혀 봅니다.</p>
+  </div>
+</header>
+
+<section class="sec">
+  <div class="pad">
+    <div class="search">
+      <div class="searchbar">
+        <input id="q" type="search" placeholder="키워드 검색 (예: 금관, 부인대, 봉수형, 마랑, 곡옥)" aria-label="통합 검색">
+        <span class="cnt" id="cnt"></span>
+      </div>
+      <div class="chips" id="filters">
+        <span class="flab">무덤</span>
+        <button class="chip2" data-g="mound" data-v="북분">북분</button>
+        <button class="chip2" data-g="mound" data-v="남분">남분</button>
+        <span class="flab" style="margin-left:8px">클래스</span>
+        <button class="chip2" data-g="kind" data-v="유물">E25 유물</button>
+        <button class="chip2" data-g="kind" data-v="유구">E25 유구</button>
+        <span class="flab" style="margin-left:8px">재질</span>
+        <button class="chip2" data-g="mat" data-v="금속">금·금동·은</button>
+        <button class="chip2" data-g="mat" data-v="유리">유리</button>
+        <button class="chip2" data-g="mat" data-v="옥">옥·장신구</button>
+        <button class="chip2" data-g="mat" data-v="마구">마구</button>
+        <button class="chip2" data-g="mat" data-v="기타">도자·칠기·토기</button>
+        <button class="chip2" data-g="imp" data-v="1">외래·수입품</button>
+      </div>
+      <div class="res" id="res"></div>
+    </div>
+  </div>
+</section>
+
+<script>
+/* 통합 검색 데이터 (황남대총 실제 출토품 기반) */
+const D=[
+  {n:"금관",h:"金冠",mound:"북분",kind:"유물",mat:"금속",imp:0,cls:"E25 Object",desc:"출(出)자형 입식과 곡옥·영락을 단 왕비의 금관.",attr:["재질:금","유형:관(冠)","명문:-","소장:국립중앙박물관"]},
+  {n:"은제 과대",h:"銀製銙帶",mound:"북분",kind:"유물",mat:"금속",imp:0,cls:"E25 Object",desc:"‘부인대(夫人帶)’ 명문이 새겨진 은제 허리띠.",attr:["재질:은","유형:과대","명문:부인대"]},
+  {n:"금제 과대·요패",h:"金製銙帶",mound:"북분",kind:"유물",mat:"금속",imp:0,cls:"E25 Object",desc:"띠꾸미개와 드림을 갖춘 금허리띠 일습.",attr:["재질:금","유형:과대"]},
+  {n:"금제 태환이식",h:"太環耳飾",mound:"북분",kind:"유물",mat:"옥",imp:0,cls:"E25 Object",desc:"굵은 고리를 단 한 쌍의 귀걸이.",attr:["재질:금","유형:이식"]},
+  {n:"곡옥",h:"曲玉",mound:"북분",kind:"유물",mat:"옥",imp:0,cls:"E25 Object",desc:"금관·목걸이에 매달린 굽은옥. 다량 출토.",attr:["재질:경옥","유형:장신구"]},
+  {n:"유리 용기",h:"琉璃容器",mound:"북분",kind:"유물",mat:"유리",imp:1,cls:"E25 Object",desc:"서역과 이어진 교역망을 보여 주는 외래계 유리.",attr:["재질:유리","계통:수입"]},
+  {n:"흑갈유 병",h:"黑褐釉甁",mound:"북분",kind:"유물",mat:"기타",imp:1,cls:"E25 Object",desc:"중국제 시유 도자병. 편년 근거로 쓰인다.",attr:["재질:도자","계통:중국제"]},
+  {n:"마구류",h:"馬具",mound:"북분",kind:"유물",mat:"마구",imp:0,cls:"E25 Object",desc:"행엽·운주·재갈·등자 등 말갖춤 일습.",attr:["재질:철·금공","유형:마구"]},
+  {n:"환두대도",h:"環頭大刀",mound:"북분",kind:"유물",mat:"금속",imp:0,cls:"E25 Object",desc:"고리자루큰칼. 위세품으로 부장.",attr:["재질:철·금공","유형:대도"]},
+  {n:"단곽·凸자형 공간",h:"單槨",mound:"북분",kind:"유구",mat:"기타",imp:0,cls:"E25 Feature",desc:"곽을 하나만 둔 단곽 구조의 매장주체부.",attr:["유구:목곽","층위:매장주체부"]},
+  {n:"금동관",h:"金銅冠",mound:"남분",kind:"유물",mat:"금속",imp:0,cls:"E25 Object",desc:"피장자가 착장한 금동제 관. 은관도 함께 출토.",attr:["재질:금동","유형:관(冠)"]},
+  {n:"경흉식",h:"頸胸飾",mound:"남분",kind:"유물",mat:"옥",imp:0,cls:"E25 Object",desc:"목·가슴을 덮은 구슬 장식. 금·옥구슬과 곡옥.",attr:["재질:금·옥","유형:장신구"]},
+  {n:"봉수형 유리병",h:"鳳首形琉璃甁",mound:"남분",kind:"유물",mat:"유리",imp:1,cls:"E25 Object",desc:"봉황 부리를 닮은 서역계 유리 물병.",attr:["재질:유리","계통:서역계","지정:보물"]},
+  {n:"유리잔",h:"琉璃盞",mound:"남분",kind:"유물",mat:"유리",imp:1,cls:"E25 Object",desc:"부장품수장궤에서 나온 유리잔. 높이 10.5cm.",attr:["재질:유리","지정:보물"]},
+  {n:"‘마랑’명 칠기",h:"馬朗銘漆器",mound:"남분",kind:"유물",mat:"기타",imp:1,cls:"E25 Object",desc:"바둑돌 그릇 추정. ‘마랑(馬朗)’ 명문이 있다.",attr:["재질:칠기","명문:마랑","계통:중국"]},
+  {n:"비단벌레 장식 마구",h:"馬具",mound:"남분",kind:"유물",mat:"마구",imp:0,cls:"E25 Object",desc:"비단벌레 날개로 장식한 화려한 말갖춤.",attr:["재질:금속·유기물","유형:마구"]},
+  {n:"환두대도",h:"環頭大刀",mound:"남분",kind:"유물",mat:"금속",imp:0,cls:"E25 Object",desc:"왕의 권위를 상징하는 장식 대도.",attr:["재질:철·금공","유형:대도"]},
+  {n:"주곽·부곽",h:"主槨·副槨",mound:"남분",kind:"유구",mat:"기타",imp:0,cls:"E25 Feature",desc:"내·외곽 사이를 잔자갈로 채운 2중곽 구조.",attr:["유구:목곽","층위:매장주체부"]},
+];
+const CC={"E25 Object":"var(--c-feat)","E25 Feature":"var(--c-feat)"};
+const st={q:"",mound:"",kind:"",mat:"",imp:""};
+const res=document.getElementById('res'),cnt=document.getElementById('cnt');
+function draw(){
+  const q=st.q.trim().toLowerCase();
+  const list=D.filter(d=>{
+    if(st.mound&&d.mound!==st.mound)return false;
+    if(st.kind&&d.kind!==st.kind)return false;
+    if(st.mat&&d.mat!==st.mat)return false;
+    if(st.imp&&!d.imp)return false;
+    if(q&&!((d.n+d.h+d.desc+d.attr.join()).toLowerCase().includes(q)))return false;
+    return true;
+  });
+  cnt.textContent=`${list.length} / ${D.length} 건`;
+  if(!list.length){res.innerHTML='<div class="none">조건에 맞는 데이터가 없습니다.</div>';return;}
+  res.innerHTML=list.map(d=>`<div class="item">
+    <div class="top2"><span class="pill cls" style="background:${CC[d.cls]}">${d.cls}</span><span class="pill mn">${d.mound}</span>${d.imp?'<span class="pill mn" style="color:#c2607a;border-color:#eccdd7">외래</span>':''}</div>
+    <h4>${d.n}<span class="hj">${d.h}</span></h4>
+    <p>${d.desc}</p>
+    <div class="attr">${d.attr.map(a=>'<span><b>'+a.split(':')[0]+'</b>:'+(a.split(':')[1]||'')+'</span>').join('')}</div>
+  </div>`).join('');
+}
+document.getElementById('q').addEventListener('input',e=>{st.q=e.target.value;draw();});
+document.getElementById('filters').addEventListener('click',e=>{
+  const b=e.target.closest('.chip2');if(!b)return;const g=b.dataset.g,v=b.dataset.v;
+  st[g]=(st[g]===v)?"":v;
+  document.querySelectorAll(`.chip2[data-g="${g}"]`).forEach(c=>c.classList.toggle('on',c.dataset.v===st[g]));
+  draw();
+});
+draw();
+</script>
+</body>
+</html>
