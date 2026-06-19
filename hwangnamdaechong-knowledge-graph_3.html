@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>황남대총 북분·남분 발굴 유물·유구 지식그래프</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.47.0/iconfont/tabler-icons.min.css">
+<style>
+  :root{--paper:#FAFAF6;--panel:#fff;--ink:#26251f;--muted:#75726a;--faint:#a4a199;
+        --line:#e9e6dc;--hair:#ddd9cf;--accent:#1f5c8c}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:var(--paper);color:var(--ink);font-family:"IBM Plex Sans KR",sans-serif;
+       display:grid;grid-template-columns:288px 1fr 300px;height:100vh;overflow:hidden;font-size:13px}
+  aside{background:var(--panel);overflow-y:auto;padding:18px 18px 40px}
+  aside.left{border-right:1px solid var(--line)}
+  aside.right{border-left:1px solid var(--line)}
+  h1{font-family:"Gowun Batang",serif;font-weight:700;font-size:18px;margin:0 0 4px;line-height:1.3}
+  .lead{font-size:11.5px;color:var(--muted);font-weight:300;line-height:1.6;margin:0 0 18px}
+  .sect{font-size:12px;font-weight:600;color:var(--ink);margin:20px 0 9px;letter-spacing:.02em}
+  label.fld{display:block;font-size:11px;color:var(--muted);margin:10px 0 4px}
+  select,.btn{width:100%;font-family:inherit;font-size:12.5px;color:var(--ink);background:#fff;
+       border:1px solid var(--hair);border-radius:9px;padding:8px 10px;cursor:pointer}
+  select:focus{outline:none;border-color:var(--accent)}
+  .btn{margin-top:8px;text-align:center;transition:border-color .15s,background .15s}
+  .btn:hover{border-color:var(--muted);background:#fbfbf8}
+  .card{border:1px solid var(--line);border-radius:10px;padding:11px 12px;background:#fcfcfa}
+  .card .t{font-weight:600;font-size:12px;margin-bottom:4px}
+  .card .d{font-size:11px;color:var(--muted);line-height:1.55}
+  .kv{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px dashed var(--line);font-size:12px}
+  .kv:last-child{border-bottom:0}.kv .k{color:var(--muted)}.kv .v{font-weight:500;text-align:right}
+  .legend{display:flex;flex-direction:column;gap:3px}
+  .chip{display:flex;align-items:center;gap:8px;cursor:pointer;padding:4px 7px;border-radius:8px;
+        border:1px solid transparent;user-select:none}
+  .chip:hover{background:#f7f6f1}.chip.on{background:#f1f4f8;border-color:#d4e0ec}
+  .chip.muted{opacity:.4}
+  .dot{width:11px;height:11px;border-radius:50%;flex:none}
+  .chip .ko{font-weight:500;font-size:12px}.chip .en{color:var(--faint);font-size:10px;margin-left:2px}
+  .chip .ct{margin-left:auto;font-size:10.5px;font-weight:600;color:var(--muted);
+            background:#f1efe8;border-radius:999px;min-width:20px;text-align:center;padding:1px 6px}
+  #center{position:relative;overflow:hidden}
+  #center svg{width:100%;height:100%;display:block;cursor:grab}#center svg:active{cursor:grabbing}
+  .topbtns{position:absolute;top:14px;right:16px;display:flex;gap:8px;z-index:4}
+  .topbtns button{font-family:inherit;font-size:12px;background:#fff;border:1px solid var(--hair);
+       border-radius:9px;padding:7px 12px;cursor:pointer}
+  .topbtns button:hover{border-color:var(--muted)}
+  .tierhead{position:absolute;top:64px;font-size:11px;color:var(--faint);font-weight:500;
+            transform:translateX(-50%);opacity:0;transition:opacity .3s;pointer-events:none}
+  .link{fill:none;stroke:#c3c0b6;stroke-width:1;stroke-opacity:.5;transition:stroke-opacity .25s,stroke .25s,stroke-width .25s}
+  .link.hi{stroke:#3f6f9e;stroke-opacity:.9;stroke-width:1.8}
+  .link.dim-link{stroke-opacity:.05}
+  .node circle{stroke:#fff;stroke-width:1.5;cursor:pointer;transition:opacity .25s,stroke .2s,stroke-width .2s}
+  .node.sel circle{stroke:#1f1e19;stroke-width:2.5}
+  .node text{font-size:10px;fill:var(--ink);pointer-events:none;
+       paint-order:stroke;stroke:var(--paper);stroke-width:3px;stroke-linejoin:round;transition:opacity .25s}
+  .node.dim{opacity:.12}
+  .llabel{font-size:9px;fill:#5a78a0;pointer-events:none;paint-order:stroke;stroke:var(--paper);stroke-width:2.5px}
+  #tip{position:absolute;pointer-events:none;background:#1f1e19;color:#f4f2ea;font-size:11.5px;
+       padding:6px 9px;border-radius:7px;opacity:0;transition:opacity .12s;max-width:230px;z-index:5}
+  .rel{display:flex;align-items:center;gap:7px;padding:5px 0;font-size:11.5px;border-bottom:1px dashed var(--line)}
+  .rel:last-child{border-bottom:0}
+  .rel .rl{color:var(--accent);font-size:10px;font-weight:600;min-width:54px}
+  .rel .nm{font-weight:500}.rel .cl{color:var(--faint);font-size:10px;margin-left:auto}
+  .selnode{display:inline-flex;align-items:center;gap:6px;background:#f1f4f8;border:1px solid #d4e0ec;
+           border-radius:999px;padding:3px 9px;font-size:11px;margin:0 5px 5px 0;cursor:pointer}
+  .selnode:hover{background:#e8eef6}
+  .ph{color:var(--faint);font-size:12px;font-style:normal}
+  .search{width:100%;font-family:inherit;font-size:12.5px;border:1px solid var(--hair);border-radius:9px;padding:8px 10px}
+  .search:focus{outline:none;border-color:var(--accent)}
+  .searchres{margin-top:6px;max-height:200px;overflow-y:auto}
+  .sres{display:flex;align-items:center;gap:7px;padding:5px 7px;border-radius:7px;cursor:pointer;font-size:11.5px}
+  .sres:hover{background:#f1f4f8}.sres .cl{color:var(--faint);font-size:10px;margin-left:auto}
+  .node.match circle{stroke:#d9a521;stroke-width:3}
+</style>
+</head>
+<body>
+<aside class="left">
+  <h1>황남대총 북분·남분<br>발굴 유물·유구 지식그래프</h1>
+  <p class="lead">북분·남분 발굴조사보고서에서 추출한 유적·유구·유물과 그 속성을 하나의 그래프로 연결했습니다. 무덤(남분·북분) 아래 매장주체부·부장곽 같은 부위가 part-of로 묶이고, 유물은 출토 부위·재질·형식·편년으로 이어집니다. 모드·보고서·노드를 선택하면 관심 영역만 진하게 강조됩니다.</p>
+
+  <div class="sect">통합 검색</div>
+  <input id="search" class="search" type="text" placeholder="키워드 검색 (예: 금관, 봉수형, 남분)" autocomplete="off">
+  <div id="searchRes" class="searchres"></div>
+
+  <div class="sect">사용자 맞춤형 보기</div>
+  <label class="fld">사용자 모드</label>
+  <select id="mode"></select>
+  <label class="fld">발굴조사보고서</label>
+  <select id="report"></select>
+  <button class="btn" id="resetAll">전체 보기로 초기화</button>
+  <button class="btn" id="tierBtn">좌→우 레이아웃으로 정리</button>
+
+  <div class="sect">현재 강조 기준</div>
+  <div class="card"><div class="t" id="modeTitle">전체 보기</div><div class="d" id="modeDesc"></div></div>
+
+  <div class="sect">범례 · 클래스 필터</div>
+  <div class="legend" id="legend"></div>
+
+  <div class="sect">통계</div>
+  <div class="kv"><span class="k">전체 노드</span><span class="v" id="stN"></span></div>
+  <div class="kv"><span class="k">전체 관계</span><span class="v" id="stL"></span></div>
+  <div class="kv"><span class="k">강조 노드</span><span class="v" id="stHN">-</span></div>
+  <div class="kv"><span class="k">강조 관계</span><span class="v" id="stHL">-</span></div>
+</aside>
+
+<div id="center">
+  <div class="topbtns">
+    <button id="recenter">중앙 정렬</button>
+    <button id="clearSel">선택 해제</button>
+  </div>
+  <div id="tip"></div>
+</div>
+
+<aside class="right">
+  <div class="sect" style="margin-top:2px">선택 정보</div>
+  <div id="selInfo"><span class="ph">노드를 클릭하면 상세 정보와 관계가 표시됩니다. 여러 노드를 눌러 누적 선택할 수 있습니다.</span></div>
+
+  <div class="sect">보고서 연동</div>
+  <div class="card"><div class="t" id="repTitle">전체 보고서</div><div class="d" id="repDesc"></div></div>
+
+  <div class="sect">반영한 데이터</div>
+  <div class="kv"><span class="k">대상 유적</span><span class="v">황남대총(98호분)</span></div>
+  <div class="kv"><span class="k">유물(예시)</span><span class="v" id="stArt"></span></div>
+  <div class="kv"><span class="k">무덤·부위</span><span class="v" id="stFeat"></span></div>
+  <div class="kv"><span class="k">속성·어휘 노드</span><span class="v" id="stAttr"></span></div>
+  <div class="card" style="margin-top:12px"><div class="d">노드를 숨기지 않고 흐림/강조로 표현해, 전체 구조와 관심 영역을 동시에 봅니다. 유물 목록·수치는 설계 예시이며 실제 값은 보고서로 확정합니다.</div></div>
+</aside>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+const CLASSES = {
+  "유적":{en:"Site",hex:"#1D9E75",icon:"ti-map-pin"},
+  "발굴조사":{en:"Excavation",hex:"#7F77DD",icon:"ti-pick"},
+  "보고서":{en:"Report",hex:"#639922",icon:"ti-file-text"},
+  "조사주체":{en:"Actor",hex:"#888780",icon:"ti-building"},
+  "무덤":{en:"Tomb",hex:"#2F7FD1",icon:"ti-building-arch"},
+  "유구":{en:"Feature",hex:"#3FA9A0",icon:"ti-box-multiple"},
+  "피장자":{en:"Person",hex:"#C2548A",icon:"ti-user"},
+  "유물":{en:"Artifact",hex:"#D85A30",icon:"ti-urn"},
+  "유물 대분류":{en:"Category",hex:"#B5762A",icon:"ti-shape"},
+  "재질":{en:"Material",hex:"#E24B4A",icon:"ti-droplet"},
+  "유구 유형":{en:"FeatureType",hex:"#D4537E",icon:"ti-category"},
+  "시대/시기":{en:"Period",hex:"#EF9F27",icon:"ti-clock"},
+  "양식":{en:"Ware/Style",hex:"#9B6BB5",icon:"ti-brush"},
+  "지정":{en:"Designation",hex:"#7A8B3F",icon:"ti-award"},
+  "명문":{en:"Inscription",hex:"#16A2B8",icon:"ti-typography"},
+  "문양":{en:"Pattern",hex:"#C77DAE",icon:"ti-flower"},
+  "계통":{en:"Origin",hex:"#5B6E8C",icon:"ti-world"},
+  "기법":{en:"Technique",hex:"#6A8E7F",icon:"ti-tools"}
+};
+const MODES = {
+  "전체 보기":{classes:[],desc:"전체 지식그래프를 동일한 강도로 봅니다. 범례에서 클래스를 켜거나 노드를 클릭해 관심 영역을 좁혀보세요."},
+  "유물 아카이브":{classes:["유물","재질","유물 대분류","시대/시기","유구"],desc:"유물과 그 기술 속성(재질·형식·편년)·출토 부위를 강조합니다. 디지털 아카이브 검색용 보기."},
+  "편년·비교 연구":{classes:["무덤","유물","시대/시기","유물 대분류","유구 유형","유구"],desc:"남분·북분과 유물의 편년·부위 맥락을 강조해 비교 분석에 활용합니다. 토기 형식(고배·장경호 등)이 적석목곽분 편년의 핵심 근거입니다."},
+  "토기 편년·양식":{classes:["유물 대분류","양식","시대/시기","재질","유물"],desc:"토기 형식·양식·편년의 연결망을 강조합니다. 같은 고배 형식이 토제·금제·은제로 제작된 점, 신라양식 분류, 형식학적 편년을 함께 봅니다."},
+  "매장 vs 부장":{classes:["유구","유구 유형","유물","피장자"],desc:"매장주체부(착장 위세품)와 부장곽(부장품)의 기능 차이를 강조합니다."},
+  "발굴 맥락":{classes:["유적","발굴조사","보고서","조사주체","무덤"],desc:"유적·발굴조사·보고서·조사주체 등 발굴 맥락을 강조합니다."},
+  "피장자·위세품":{classes:["피장자","유구","유물","재질"],desc:"피장자와 그가 안치된 매장주체부의 착장 위세품을 강조합니다."},
+  "지정문화재":{classes:["지정","유물"],desc:"국보·보물로 지정된 유물을 강조합니다. 전시·검색용 보기."},
+  "명문·문양 연구":{classes:["명문","문양","유물","피장자"],desc:"명문(夫人帶)·문양(출자형·곡옥장식·영락)과 그것을 지닌 유물·피장자를 강조합니다."},
+  "교역·외래계":{classes:["계통","유물","재질"],desc:"로마·지중해계 유리기 등 외래·교역품과 그 계통을 강조합니다."},
+  "유리 제작·교역":{classes:["유물 대분류","기법","계통","양식","유적","유물"],desc:"유리용기를 중심으로 제작기법(대롱불기법)·계통(로마·지중해계·소다유리)·비교 유적을 함께 강조합니다."}
+};
+const REP_DESC = {
+  "황남대총 북분 발굴조사보고서":"북분(왕비묘 추정) 관련 유구·유물을 강조합니다. 금관·금제 과대·은제 '夫人帶' 허리띠 등.",
+  "황남대총 남분 발굴조사보고서":"남분(왕묘 추정·선축) 관련 유구·유물을 강조합니다. 금동관·은관·환두대도·봉수형 유리병 등."
+};
+const TIER={유적:0,조사주체:0,보고서:0,발굴조사:1,무덤:2,"유구":3,피장자:4,유물:4,"유물 대분류":5,재질:5,"유구 유형":5,"시대/시기":5,양식:5,지정:5,명문:5,문양:5,계통:5,기법:5};
+const TIERLBL=["유적·기관·보고서","발굴조사","무덤","유구","유물·피장자","속성·어휘"];
+const TN=TIERLBL.length-1;
+
+const GRAPH={nodes:[
+  {id:"site",label:"황남대총(경주 98호분)",cls:"유적"},
+  {id:"site_wolseong",label:"월성로 가-13호",cls:"유적"},
+  {id:"site_geumgwan",label:"금관총",cls:"유적"},
+  {id:"site_seobong",label:"서봉총",cls:"유적"},
+  {id:"site_geumryeong",label:"금령총",cls:"유적"},
+  {id:"site_cheonma",label:"천마총",cls:"유적"},
+  {id:"org",label:"문화재관리국 문화재연구소",cls:"조사주체"},
+  {id:"exc",label:"황남대총 발굴조사 (1973–75)",cls:"발굴조사"},
+  {id:"rep_buk",label:"황남대총 북분 발굴조사보고서",cls:"보고서"},
+  {id:"rep_nam",label:"황남대총 남분 발굴조사보고서",cls:"보고서"},
+  {id:"tomb_nam",label:"남분 (선축·왕묘 추정)",cls:"무덤"},
+  {id:"tomb_buk",label:"북분 (후축·왕비묘 추정)",cls:"무덤"},
+  {id:"c_nam_ju",label:"남분 주곽(매장주체부)",cls:"유구"},
+  {id:"c_nam_bu",label:"남분 부곽(부장곽)",cls:"유구"},
+  {id:"c_nam_cairn",label:"남분 적석부",cls:"유구"},
+  {id:"c_nam_chamber",label:"남분 목곽",cls:"유구"},
+  {id:"c_buk_ju",label:"북분 주곽(매장주체부)",cls:"유구"},
+  {id:"c_buk_bu",label:"북분 부곽(부장공간)",cls:"유구"},
+  {id:"c_buk_cairn",label:"북분 적석부",cls:"유구"},
+  {id:"c_buk_kerb",label:"북분 호석",cls:"유구"},
+  {id:"per_nam",label:"남분 피장자(남성)",cls:"피장자"},
+  {id:"per_buk",label:"북분 피장자(여성)",cls:"피장자"},
+  {id:"a_buk_crown",label:"금관",cls:"유물"},
+  {id:"a_buk_belt",label:"금제 허리띠(과대)",cls:"유물"},
+  {id:"a_buk_ear",label:"금제 태환이식",cls:"유물"},
+  {id:"a_buk_neck",label:"경식(목걸이)",cls:"유물"},
+  {id:"a_buk_silbelt",label:"은제 허리띠(銀製 銙帶)",cls:"유물"},
+  {id:"a_buk_glass",label:"유리잔(북분)",cls:"유물"},
+  {id:"a_buk_gobae",label:"고배(북분)",cls:"유물"},
+  {id:"a_buk_dgho",label:"단경호(목짧은항아리)",cls:"유물"},
+  {id:"a_buk_daebu",label:"대부장경호",cls:"유물"},
+  {id:"a_buk_goldgobae",label:"금제 고배",cls:"유물"},
+  {id:"a_buk_silvercup",label:"은잔(銀盞)",cls:"유물"},
+  {id:"a_nam_gilt",label:"금동관",cls:"유물"},
+  {id:"a_nam_silcrown",label:"은관",cls:"유물"},
+  {id:"a_nam_sword",label:"환두대도",cls:"유물"},
+  {id:"a_nam_belt",label:"금제 허리띠(남분)",cls:"유물"},
+  {id:"a_nam_bottle",label:"봉수형 유리병",cls:"유물"},
+  {id:"a_nam_cup",label:"유리잔(남분)",cls:"유물"},
+  {id:"a_nam_saddle",label:"안교(안장)",cls:"유물"},
+  {id:"a_nam_stirrup",label:"등자",cls:"유물"},
+  {id:"a_nam_bit",label:"재갈",cls:"유물"},
+  {id:"a_nam_pendant",label:"행엽(말띠드리개)",cls:"유물"},
+  {id:"a_nam_gobae",label:"고배(남분)",cls:"유물"},
+  {id:"a_nam_yugae",label:"유개고배(뚜껑굽다리접시)",cls:"유물"},
+  {id:"a_nam_jgho",label:"장경호(목긴항아리)",cls:"유물"},
+  {id:"a_nam_gidae",label:"기대(그릇받침)",cls:"유물"},
+  {id:"a_nam_armor",label:"철제 무기·갑주",cls:"유물"},
+  {id:"a_buk_sikri",label:"금동신발(식리)",cls:"유물"},
+  {id:"a_buk_gwanmo",label:"금제 관모·관식",cls:"유물"},
+  {id:"a_buk_gokok",label:"곡옥·유리구슬 가슴걸이",cls:"유물"},
+  {id:"a_buk_glassbead",label:"유리구슬류",cls:"유물"},
+  {id:"a_buk_bracelet",label:"금팔찌(천)",cls:"유물"},
+  {id:"a_buk_ring",label:"금반지(지환)",cls:"유물"},
+  {id:"a_buk_bronze",label:"청동 용기(합·초두)",cls:"유물"},
+  {id:"a_nam_sikri",label:"금동신발(식리)",cls:"유물"},
+  {id:"a_nam_gwanmo",label:"은제 관모·관식",cls:"유물"},
+  {id:"a_nam_bronze",label:"청동 초두·다리미",cls:"유물"},
+  {id:"a_nam_ingot",label:"철정(鐵鋌)",cls:"유물"},
+  {id:"a_nam_cutglass",label:"커트글라스 완",cls:"유물"},
+  {id:"m_gold",label:"금",cls:"재질"},
+  {id:"m_silver",label:"은",cls:"재질"},
+  {id:"m_gilt",label:"금동",cls:"재질"},
+  {id:"m_glass",label:"유리",cls:"재질"},
+  {id:"m_iron",label:"철",cls:"재질"},
+  {id:"m_jade",label:"옥",cls:"재질"},
+  {id:"m_bronze",label:"청동",cls:"재질"},
+  {id:"m_pot",label:"토제(도질)",cls:"재질"},
+  {id:"t_crown",label:"관(冠)",cls:"유물 대분류"},
+  {id:"t_belt",label:"대금구(허리띠)",cls:"유물 대분류"},
+  {id:"t_ear",label:"이식",cls:"유물 대분류"},
+  {id:"t_neck",label:"경식",cls:"유물 대분류"},
+  {id:"t_sword",label:"환두대도",cls:"유물 대분류"},
+  {id:"t_glass",label:"유리용기",cls:"유물 대분류"},
+  {id:"t_cup",label:"잔(盞)",cls:"유물 대분류"},
+  {id:"t_gobae",label:"고배",cls:"유물 대분류"},
+  {id:"t_jgho",label:"장경호",cls:"유물 대분류"},
+  {id:"t_dgho",label:"단경호",cls:"유물 대분류"},
+  {id:"t_gidae",label:"기대",cls:"유물 대분류"},
+  {id:"t_sikri",label:"식리(신발)",cls:"유물 대분류"},
+  {id:"t_gwanmo",label:"관모·관식",cls:"유물 대분류"},
+  {id:"t_bracelet",label:"천(팔찌)",cls:"유물 대분류"},
+  {id:"t_ring",label:"지환(반지)",cls:"유물 대분류"},
+  {id:"t_bead",label:"구슬류(가슴걸이)",cls:"유물 대분류"},
+  {id:"t_bronzevessel",label:"청동용기",cls:"유물 대분류"},
+  {id:"t_ingot",label:"철정",cls:"유물 대분류"},
+  {id:"t_horse",label:"마구",cls:"유물 대분류"},
+  {id:"t_weapon",label:"무기·갑주",cls:"유물 대분류"},
+  {id:"ft_ju",label:"매장주체부",cls:"유구 유형"},
+  {id:"ft_bu",label:"부장곽",cls:"유구 유형"},
+  {id:"ft_cairn",label:"적석부",cls:"유구 유형"},
+  {id:"ft_chamber",label:"목곽",cls:"유구 유형"},
+  {id:"ft_kerb",label:"호석",cls:"유구 유형"},
+  {id:"p_silla",label:"신라 마립간기",cls:"시대/시기"},
+  {id:"p_5c",label:"5세기",cls:"시대/시기"},
+  {id:"st_silla",label:"신라양식(낙동강 이동양식)",cls:"양식"},
+  {id:"st_gaya",label:"가야양식(낙동강 이서양식)",cls:"양식"},
+  {id:"des_nat",label:"국보(國寶)",cls:"지정"},
+  {id:"des_treasure",label:"보물(寶物)",cls:"지정"},
+  {id:"ins_buin",label:"夫人帶 (명문)",cls:"명문"},
+  {id:"pat_chulja",label:"출자형(出字形)",cls:"문양"},
+  {id:"pat_gokok",label:"곡옥장식",cls:"문양"},
+  {id:"pat_yeongnak",label:"영락(瓔珞)",cls:"문양"},
+  {id:"org_rome",label:"로마·지중해계",cls:"계통"},
+  {id:"org_west",label:"서역계(유리·상감)",cls:"계통"},
+  {id:"st_soda",label:"소다유리계통",cls:"양식"},
+  {id:"tech_blow",label:"대롱불기법",cls:"기법"}
+],links:[
+  {source:"exc",target:"site",rel:"조사"},
+  {source:"org",target:"exc",rel:"수행"},
+  {source:"rep_buk",target:"tomb_buk",rel:"기술"},
+  {source:"rep_nam",target:"tomb_nam",rel:"기술"},
+  {source:"rep_buk",target:"per_buk",rel:"기술"},
+  {source:"rep_nam",target:"per_nam",rel:"기술"},
+  {source:"tomb_nam",target:"site",rel:"부분"},
+  {source:"tomb_buk",target:"site",rel:"부분"},
+  {source:"tomb_nam",target:"tomb_buk",rel:"선후"},
+  {source:"c_buk_kerb",target:"tomb_nam",rel:"덧댐"},
+  {source:"c_nam_ju",target:"tomb_nam",rel:"부분"},
+  {source:"c_nam_bu",target:"tomb_nam",rel:"부분"},
+  {source:"c_nam_cairn",target:"tomb_nam",rel:"부분"},
+  {source:"c_nam_chamber",target:"tomb_nam",rel:"부분"},
+  {source:"c_buk_ju",target:"tomb_buk",rel:"부분"},
+  {source:"c_buk_bu",target:"tomb_buk",rel:"부분"},
+  {source:"c_buk_cairn",target:"tomb_buk",rel:"부분"},
+  {source:"c_buk_kerb",target:"tomb_buk",rel:"부분"},
+  {source:"c_nam_ju",target:"ft_ju",rel:"부위"},
+  {source:"c_nam_bu",target:"ft_bu",rel:"부위"},
+  {source:"c_nam_cairn",target:"ft_cairn",rel:"부위"},
+  {source:"c_nam_chamber",target:"ft_chamber",rel:"부위"},
+  {source:"c_buk_ju",target:"ft_ju",rel:"부위"},
+  {source:"c_buk_bu",target:"ft_bu",rel:"부위"},
+  {source:"c_buk_cairn",target:"ft_cairn",rel:"부위"},
+  {source:"c_buk_kerb",target:"ft_kerb",rel:"부위"},
+  {source:"per_nam",target:"c_nam_ju",rel:"안치"},
+  {source:"per_buk",target:"c_buk_ju",rel:"안치"},
+  {source:"per_nam",target:"per_buk",rel:"부부"},
+  {source:"a_buk_silbelt",target:"ins_buin",rel:"명문"},
+  {source:"ins_buin",target:"per_buk",rel:"성별근거"},
+  {source:"a_buk_crown",target:"c_buk_ju",rel:"출토"},
+  {source:"a_buk_crown",target:"m_gold",rel:"재질"},
+  {source:"a_buk_crown",target:"t_crown",rel:"형식"},
+  {source:"a_buk_crown",target:"p_5c",rel:"편년"},
+  {source:"a_buk_crown",target:"rep_buk",rel:"기술"},
+  {source:"a_buk_belt",target:"c_buk_ju",rel:"출토"},
+  {source:"a_buk_belt",target:"m_gold",rel:"재질"},
+  {source:"a_buk_belt",target:"t_belt",rel:"형식"},
+  {source:"a_buk_belt",target:"rep_buk",rel:"기술"},
+  {source:"a_buk_ear",target:"c_buk_ju",rel:"출토"},
+  {source:"a_buk_ear",target:"m_gold",rel:"재질"},
+  {source:"a_buk_ear",target:"t_ear",rel:"형식"},
+  {source:"a_buk_ear",target:"rep_buk",rel:"기술"},
+  {source:"a_buk_neck",target:"c_buk_ju",rel:"출토"},
+  {source:"a_buk_neck",target:"m_jade",rel:"재질"},
+  {source:"a_buk_neck",target:"t_neck",rel:"형식"},
+  {source:"a_buk_neck",target:"rep_buk",rel:"기술"},
+  {source:"a_buk_silbelt",target:"c_buk_ju",rel:"출토"},
+  {source:"a_buk_silbelt",target:"m_silver",rel:"재질"},
+  {source:"a_buk_silbelt",target:"t_belt",rel:"형식"},
+  {source:"a_buk_silbelt",target:"rep_buk",rel:"기술"},
+  {source:"a_buk_glass",target:"c_buk_bu",rel:"출토"},
+  {source:"a_buk_glass",target:"m_glass",rel:"재질"},
+  {source:"a_buk_glass",target:"t_glass",rel:"형식"},
+  {source:"a_buk_glass",target:"rep_buk",rel:"기술"},
+  {source:"a_buk_gobae",target:"c_buk_bu",rel:"출토"},
+  {source:"a_buk_gobae",target:"m_pot",rel:"재질"},
+  {source:"a_buk_gobae",target:"t_gobae",rel:"형식"},
+  {source:"a_buk_gobae",target:"rep_buk",rel:"기술"},
+  {source:"a_buk_dgho",target:"c_buk_bu",rel:"출토"},
+  {source:"a_buk_dgho",target:"m_pot",rel:"재질"},
+  {source:"a_buk_dgho",target:"t_dgho",rel:"형식"},
+  {source:"a_buk_dgho",target:"rep_buk",rel:"기술"},
+  {source:"a_buk_daebu",target:"c_buk_bu",rel:"출토"},
+  {source:"a_buk_daebu",target:"m_pot",rel:"재질"},
+  {source:"a_buk_daebu",target:"t_jgho",rel:"형식"},
+  {source:"a_buk_daebu",target:"rep_buk",rel:"기술"},
+  {source:"a_nam_gilt",target:"c_nam_ju",rel:"출토"},
+  {source:"a_nam_gilt",target:"m_gilt",rel:"재질"},
+  {source:"a_nam_gilt",target:"t_crown",rel:"형식"},
+  {source:"a_nam_gilt",target:"p_5c",rel:"편년"},
+  {source:"a_nam_gilt",target:"rep_nam",rel:"기술"},
+  {source:"a_nam_silcrown",target:"c_nam_ju",rel:"출토"},
+  {source:"a_nam_silcrown",target:"m_silver",rel:"재질"},
+  {source:"a_nam_silcrown",target:"t_crown",rel:"형식"},
+  {source:"a_nam_silcrown",target:"rep_nam",rel:"기술"},
+  {source:"a_nam_sword",target:"c_nam_ju",rel:"출토"},
+  {source:"a_nam_sword",target:"m_iron",rel:"재질"},
+  {source:"a_nam_sword",target:"t_sword",rel:"형식"},
+  {source:"a_nam_sword",target:"rep_nam",rel:"기술"},
+  {source:"a_nam_belt",target:"c_nam_ju",rel:"출토"},
+  {source:"a_nam_belt",target:"m_gold",rel:"재질"},
+  {source:"a_nam_belt",target:"t_belt",rel:"형식"},
+  {source:"a_nam_belt",target:"rep_nam",rel:"기술"},
+  {source:"a_nam_bottle",target:"c_nam_bu",rel:"출토"},
+  {source:"a_nam_bottle",target:"m_glass",rel:"재질"},
+  {source:"a_nam_bottle",target:"t_glass",rel:"형식"},
+  {source:"a_nam_bottle",target:"p_5c",rel:"편년"},
+  {source:"a_nam_bottle",target:"rep_nam",rel:"기술"},
+  {source:"a_nam_cup",target:"c_nam_bu",rel:"출토"},
+  {source:"a_nam_cup",target:"m_glass",rel:"재질"},
+  {source:"a_nam_cup",target:"t_glass",rel:"형식"},
+  {source:"a_nam_cup",target:"rep_nam",rel:"기술"},
+  {source:"a_nam_saddle",target:"c_nam_bu",rel:"출토"},
+  {source:"a_nam_saddle",target:"m_iron",rel:"재질"},
+  {source:"a_nam_saddle",target:"t_horse",rel:"형식"},
+  {source:"a_nam_saddle",target:"rep_nam",rel:"기술"},
+  {source:"a_nam_stirrup",target:"c_nam_bu",rel:"출토"},
+  {source:"a_nam_stirrup",target:"m_iron",rel:"재질"},
+  {source:"a_nam_stirrup",target:"t_horse",rel:"형식"},
+  {source:"a_nam_stirrup",target:"rep_nam",rel:"기술"},
+  {source:"a_nam_bit",target:"c_nam_bu",rel:"출토"},
+  {source:"a_nam_bit",target:"m_iron",rel:"재질"},
+  {source:"a_nam_bit",target:"t_horse",rel:"형식"},
+  {source:"a_nam_bit",target:"rep_nam",rel:"기술"},
+  {source:"a_nam_pendant",target:"c_nam_bu",rel:"출토"},
+  {source:"a_nam_pendant",target:"m_gilt",rel:"재질"},
+  {source:"a_nam_pendant",target:"t_horse",rel:"형식"},
+  {source:"a_nam_pendant",target:"rep_nam",rel:"기술"},
+  {source:"a_nam_gobae",target:"c_nam_bu",rel:"출토"},
+  {source:"a_nam_gobae",target:"m_pot",rel:"재질"},
+  {source:"a_nam_gobae",target:"t_gobae",rel:"형식"},
+  {source:"a_nam_gobae",target:"rep_nam",rel:"기술"},
+  {source:"a_nam_yugae",target:"c_nam_bu",rel:"출토"},
+  {source:"a_nam_yugae",target:"m_pot",rel:"재질"},
+  {source:"a_nam_yugae",target:"t_gobae",rel:"형식"},
+  {source:"a_nam_yugae",target:"rep_nam",rel:"기술"},
+  {source:"a_nam_jgho",target:"c_nam_bu",rel:"출토"},
+  {source:"a_nam_jgho",target:"m_pot",rel:"재질"},
+  {source:"a_nam_jgho",target:"t_jgho",rel:"형식"},
+  {source:"a_nam_jgho",target:"rep_nam",rel:"기술"},
+  {source:"a_nam_gidae",target:"c_nam_bu",rel:"출토"},
+  {source:"a_nam_gidae",target:"m_pot",rel:"재질"},
+  {source:"a_nam_gidae",target:"t_gidae",rel:"형식"},
+  {source:"a_nam_gidae",target:"rep_nam",rel:"기술"},
+  {source:"a_nam_armor",target:"c_nam_bu",rel:"출토"},
+  {source:"a_nam_armor",target:"m_iron",rel:"재질"},
+  {source:"a_nam_armor",target:"t_weapon",rel:"형식"},
+  {source:"a_nam_armor",target:"rep_nam",rel:"기술"},
+  {source:"a_buk_gobae",target:"p_5c",rel:"편년"},
+  {source:"a_buk_dgho",target:"p_5c",rel:"편년"},
+  {source:"a_buk_daebu",target:"p_5c",rel:"편년"},
+  {source:"a_nam_gobae",target:"p_5c",rel:"편년"},
+  {source:"a_nam_yugae",target:"p_5c",rel:"편년"},
+  {source:"a_nam_jgho",target:"p_5c",rel:"편년"},
+  {source:"a_nam_gidae",target:"p_5c",rel:"편년"},
+  {source:"t_gobae",target:"p_5c",rel:"형식편년"},
+  {source:"t_jgho",target:"p_5c",rel:"형식편년"},
+  {source:"t_dgho",target:"p_5c",rel:"형식편년"},
+  {source:"tomb_nam",target:"p_silla",rel:"편년"},
+  {source:"tomb_buk",target:"p_silla",rel:"편년"},
+  {source:"a_buk_goldgobae",target:"c_buk_ju",rel:"출토"},
+  {source:"a_buk_goldgobae",target:"m_gold",rel:"재질"},
+  {source:"a_buk_goldgobae",target:"t_gobae",rel:"형식"},
+  {source:"a_buk_goldgobae",target:"p_5c",rel:"편년"},
+  {source:"a_buk_goldgobae",target:"rep_buk",rel:"기술"},
+  {source:"a_buk_gobae",target:"st_silla",rel:"양식"},
+  {source:"a_buk_dgho",target:"st_silla",rel:"양식"},
+  {source:"a_buk_daebu",target:"st_silla",rel:"양식"},
+  {source:"a_nam_gobae",target:"st_silla",rel:"양식"},
+  {source:"a_nam_yugae",target:"st_silla",rel:"양식"},
+  {source:"a_nam_jgho",target:"st_silla",rel:"양식"},
+  {source:"a_nam_gidae",target:"st_silla",rel:"양식"},
+  {source:"st_gaya",target:"st_silla",rel:"대비"},
+  {source:"a_buk_sikri",target:"c_buk_ju",rel:"출토"},
+  {source:"a_buk_sikri",target:"m_gilt",rel:"재질"},
+  {source:"a_buk_sikri",target:"t_sikri",rel:"형식"},
+  {source:"a_buk_sikri",target:"rep_buk",rel:"기술"},
+  {source:"a_buk_gwanmo",target:"c_buk_ju",rel:"출토"},
+  {source:"a_buk_gwanmo",target:"m_gold",rel:"재질"},
+  {source:"a_buk_gwanmo",target:"t_gwanmo",rel:"형식"},
+  {source:"a_buk_gwanmo",target:"rep_buk",rel:"기술"},
+  {source:"a_buk_gokok",target:"c_buk_ju",rel:"출토"},
+  {source:"a_buk_gokok",target:"m_jade",rel:"재질"},
+  {source:"a_buk_gokok",target:"t_bead",rel:"형식"},
+  {source:"a_buk_gokok",target:"rep_buk",rel:"기술"},
+  {source:"a_buk_glassbead",target:"c_buk_ju",rel:"출토"},
+  {source:"a_buk_glassbead",target:"m_glass",rel:"재질"},
+  {source:"a_buk_glassbead",target:"t_bead",rel:"형식"},
+  {source:"a_buk_glassbead",target:"rep_buk",rel:"기술"},
+  {source:"a_buk_bracelet",target:"c_buk_ju",rel:"출토"},
+  {source:"a_buk_bracelet",target:"m_gold",rel:"재질"},
+  {source:"a_buk_bracelet",target:"t_bracelet",rel:"형식"},
+  {source:"a_buk_bracelet",target:"rep_buk",rel:"기술"},
+  {source:"a_buk_ring",target:"c_buk_ju",rel:"출토"},
+  {source:"a_buk_ring",target:"m_gold",rel:"재질"},
+  {source:"a_buk_ring",target:"t_ring",rel:"형식"},
+  {source:"a_buk_ring",target:"rep_buk",rel:"기술"},
+  {source:"a_buk_bronze",target:"c_buk_bu",rel:"출토"},
+  {source:"a_buk_bronze",target:"m_bronze",rel:"재질"},
+  {source:"a_buk_bronze",target:"t_bronzevessel",rel:"형식"},
+  {source:"a_buk_bronze",target:"rep_buk",rel:"기술"},
+  {source:"a_nam_sikri",target:"c_nam_ju",rel:"출토"},
+  {source:"a_nam_sikri",target:"m_gilt",rel:"재질"},
+  {source:"a_nam_sikri",target:"t_sikri",rel:"형식"},
+  {source:"a_nam_sikri",target:"rep_nam",rel:"기술"},
+  {source:"a_nam_gwanmo",target:"c_nam_ju",rel:"출토"},
+  {source:"a_nam_gwanmo",target:"m_silver",rel:"재질"},
+  {source:"a_nam_gwanmo",target:"t_gwanmo",rel:"형식"},
+  {source:"a_nam_gwanmo",target:"rep_nam",rel:"기술"},
+  {source:"a_nam_bronze",target:"c_nam_bu",rel:"출토"},
+  {source:"a_nam_bronze",target:"m_bronze",rel:"재질"},
+  {source:"a_nam_bronze",target:"t_bronzevessel",rel:"형식"},
+  {source:"a_nam_bronze",target:"rep_nam",rel:"기술"},
+  {source:"a_nam_ingot",target:"c_nam_bu",rel:"출토"},
+  {source:"a_nam_ingot",target:"m_iron",rel:"재질"},
+  {source:"a_nam_ingot",target:"t_ingot",rel:"형식"},
+  {source:"a_nam_ingot",target:"rep_nam",rel:"기술"},
+  {source:"a_nam_cutglass",target:"c_nam_bu",rel:"출토"},
+  {source:"a_nam_cutglass",target:"m_glass",rel:"재질"},
+  {source:"a_nam_cutglass",target:"t_glass",rel:"형식"},
+  {source:"a_nam_cutglass",target:"rep_nam",rel:"기술"},
+  {source:"a_buk_crown",target:"des_nat",rel:"지정"},
+  {source:"a_buk_belt",target:"des_nat",rel:"지정"},
+  {source:"a_buk_ear",target:"des_treasure",rel:"지정"},
+  {source:"a_buk_neck",target:"des_treasure",rel:"지정"},
+  {source:"a_nam_bottle",target:"des_treasure",rel:"지정"},
+  {source:"a_nam_cutglass",target:"des_treasure",rel:"지정"},
+  {source:"a_buk_crown",target:"pat_chulja",rel:"문양"},
+  {source:"a_buk_crown",target:"pat_gokok",rel:"문양"},
+  {source:"a_buk_crown",target:"pat_yeongnak",rel:"문양"},
+  {source:"a_nam_gilt",target:"pat_chulja",rel:"문양"},
+  {source:"a_nam_silcrown",target:"pat_chulja",rel:"문양"},
+  {source:"a_buk_gwanmo",target:"pat_yeongnak",rel:"문양"},
+  {source:"a_buk_gokok",target:"pat_gokok",rel:"문양"},
+  {source:"a_nam_bottle",target:"org_rome",rel:"계통"},
+  {source:"a_nam_cup",target:"org_rome",rel:"계통"},
+  {source:"a_buk_glass",target:"org_rome",rel:"계통"},
+  {source:"a_nam_cutglass",target:"org_rome",rel:"계통"},
+  {source:"a_buk_glassbead",target:"org_west",rel:"계통"},
+  {source:"tech_blow",target:"t_glass",rel:"기법"},
+  {source:"site_wolseong",target:"t_glass",rel:"출토"},
+  {source:"site_geumgwan",target:"t_glass",rel:"출토"},
+  {source:"site_seobong",target:"t_glass",rel:"출토"},
+  {source:"site_geumryeong",target:"t_glass",rel:"출토"},
+  {source:"site_cheonma",target:"t_glass",rel:"출토"},
+  {source:"org_rome",target:"st_soda",rel:"성분"},
+  {source:"a_buk_silvercup",target:"c_buk_ju",rel:"출토"},
+  {source:"a_buk_silvercup",target:"m_silver",rel:"재질"},
+  {source:"a_buk_silvercup",target:"t_cup",rel:"형식"},
+  {source:"a_buk_silvercup",target:"rep_buk",rel:"기술"},
+  {source:"p_5c",target:"p_silla",rel:"시기"}
+]};
+
+const nodes=GRAPH.nodes, links=GRAPH.links.map(l=>({...l}));
+const deg={}; nodes.forEach(n=>deg[n.id]=0);
+links.forEach(l=>{deg[l.source]=(deg[l.source]||0)+1;deg[l.target]=(deg[l.target]||0)+1});
+nodes.forEach(n=>n.r=6+Math.min(deg[n.id],12)*1.0);
+const labelSet=new Set(nodes.slice().sort((a,b)=>deg[b.id]-deg[a.id]).slice(0,16).map(n=>n.id));
+const byId={}; nodes.forEach(n=>byId[n.id]=n);
+const nb={}; nodes.forEach(n=>nb[n.id]=new Set());
+links.forEach(l=>{nb[l.source].add(l.target);nb[l.target].add(l.source)});
+const counts={}; nodes.forEach(n=>counts[n.cls]=(counts[n.cls]||0)+1);
+const sid=l=>typeof l.source==="object"?l.source.id:l.source;
+const tid=l=>typeof l.target==="object"?l.target.id:l.target;
+
+document.getElementById("stN").textContent=nodes.length;
+document.getElementById("stL").textContent=links.length;
+document.getElementById("stArt").textContent=(counts["유물"]||0)+"건";
+document.getElementById("stFeat").textContent=((counts["무덤"]||0)+(counts["유구"]||0))+"기";
+document.getElementById("stAttr").textContent=
+  (["재질","유물 대분류","유구 유형","편년"].reduce((s,c)=>s+(counts[c]||0),0))+"개";
+
+const center=document.getElementById("center");
+let W=center.clientWidth,H=center.clientHeight;
+const svg=d3.select("#center").append("svg").attr("viewBox",[0,0,W,H]);
+const gg=svg.append("g");
+const headLayer=d3.select("#center");
+const tip=d3.select("#tip");
+
+const sim=d3.forceSimulation(nodes)
+  .force("link",d3.forceLink(links).id(d=>d.id).distance(60).strength(.45))
+  .force("charge",d3.forceManyBody().strength(-160))
+  .force("center",d3.forceCenter(W/2,H/2))
+  .force("collide",d3.forceCollide().radius(d=>d.r+7))
+  .force("x",d3.forceX(W/2).strength(.04))
+  .force("y",d3.forceY(H/2).strength(.04));
+
+const link=gg.append("g").selectAll("path").data(links).join("path").attr("class","link");
+const node=gg.append("g").selectAll("g").data(nodes).join("g").attr("class","node");
+node.append("circle").attr("r",d=>d.r).attr("fill",d=>CLASSES[d.cls].hex).attr("fill-opacity",.85);
+node.append("text").attr("y",d=>d.r+11).attr("text-anchor","middle").text(d=>d.label);
+
+const activeClasses=new Set();
+const focusSet=new Set();
+let reportFocus=null, tierOn=false, lastSel=null;
+
+let moved=false;
+node.call(d3.drag()
+  .on("start",(e,d)=>{moved=false;if(!e.active)sim.alphaTarget(.3).restart();d.fx=d.x;d.fy=d.y;})
+  .on("drag",(e,d)=>{moved=true;d.fx=e.x;d.fy=e.y;})
+  .on("end",(e,d)=>{if(!e.active)sim.alphaTarget(0);d.fx=null;d.fy=null;
+    if(!moved)toggleNode(d);}));
+
+node.on("mouseover",(e,d)=>{
+    tip.html(`<b>${d.label}</b> · ${d.cls}`).style("opacity",1);})
+  .on("mousemove",e=>{const r=center.getBoundingClientRect();
+    tip.style("left",(e.clientX-r.left+14)+"px").style("top",(e.clientY-r.top+12)+"px");})
+  .on("mouseout",()=>tip.style("opacity",0));
+
+function toggleNode(d){
+  if(focusSet.has(d.id)){focusSet.delete(d.id); if(lastSel===d.id)lastSel=null;}
+  else {focusSet.add(d.id); lastSel=d.id;}
+  if(focusSet.size===0)lastSel=null;
+  recompute();
+}
+
+function recompute(){
+  const noClass=activeClasses.size===0, noFocus=focusSet.size===0, noRep=!reportFocus;
+  const allOn=noClass&&noFocus&&noRep;
+  const hi=new Set();
+  if(!noClass)nodes.forEach(n=>{if(activeClasses.has(n.cls))hi.add(n.id);});
+  if(!noFocus)focusSet.forEach(id=>{hi.add(id);nb[id].forEach(x=>hi.add(x));});
+  if(!noRep){hi.add(reportFocus);nb[reportFocus].forEach(x=>{hi.add(x);nb[x].forEach(y=>hi.add(y));});}
+
+  let hl=0;
+  link.each(function(l){
+    const both=hi.has(sid(l))&&hi.has(tid(l));
+    const strong=!allOn&&both;
+    if(strong)hl++;
+    d3.select(this).classed("hi",strong).classed("dim-link",!(allOn||both));
+  });
+  node.classed("dim",n=>allOn?false:!hi.has(n.id));
+  node.classed("sel",n=>focusSet.has(n.id));
+  const showAllLbl=!allOn&&hi.size<=30;
+  node.selectAll("text").style("opacity",n=>{
+    if(allOn)return labelSet.has(n.id)||n.cls==="유적"?1:0;
+    if(!hi.has(n.id))return 0;
+    return (showAllLbl||labelSet.has(n.id)||focusSet.has(n.id))?1:0;
+  });
+  document.getElementById("stHN").textContent=allOn?"-":hi.size;
+  document.getElementById("stHL").textContent=allOn?"-":hl;
+  renderInfo();
+  d3.selectAll("#legend .chip").classed("on",function(){return activeClasses.has(this.dataset.cls);})
+    .classed("muted",function(){return activeClasses.size>0&&!activeClasses.has(this.dataset.cls);});
+}
+
+function renderInfo(){
+  const box=document.getElementById("selInfo");
+  if(focusSet.size===0){box.innerHTML='<span class="ph">노드를 클릭하면 상세 정보와 관계가 표시됩니다. 여러 노드를 눌러 누적 선택할 수 있습니다.</span>';return;}
+  let html="";
+  if(focusSet.size>1){
+    html+='<div style="margin-bottom:10px">';
+    focusSet.forEach(id=>{const n=byId[id];
+      html+=`<span class="selnode" data-id="${id}"><span class="dot" style="background:${CLASSES[n.cls].hex}"></span>${n.label}<i class="ti ti-x" style="font-size:12px;color:#9a978f"></i></span>`;});
+    html+='</div>';
+  }
+  const d=byId[lastSel]||byId[[...focusSet][focusSet.size-1]];
+  if(d){
+    html+=`<div class="card"><div class="t"><span class="dot" style="background:${CLASSES[d.cls].hex};display:inline-block;margin-right:6px"></span>${d.label}</div>`;
+    html+=`<div class="d">${d.cls} · ${CLASSES[d.cls].en} · 연결 ${nb[d.id].size}개</div></div>`;
+    const rels=links.filter(l=>sid(l)===d.id||tid(l)===d.id)
+      .map(l=>{const other=sid(l)===d.id?tid(l):sid(l);return {rel:l.rel,o:byId[other]};});
+    html+='<div style="margin-top:10px">';
+    rels.forEach(r=>{if(!r.o)return;
+      html+=`<div class="rel"><span class="rl">${r.rel}</span><span class="dot" style="background:${CLASSES[r.o.cls].hex}"></span><span class="nm">${r.o.label}</span><span class="cl">${r.o.cls}</span></div>`;});
+    html+='</div>';
+  }
+  box.innerHTML=html;
+  box.querySelectorAll(".selnode").forEach(el=>el.onclick=()=>{
+    focusSet.delete(el.dataset.id);if(lastSel===el.dataset.id)lastSel=null;recompute();});
+}
+
+sim.on("tick",()=>{
+  link.attr("d",d=>{const dx=d.target.x-d.source.x,dy=d.target.y-d.source.y,dr=Math.hypot(dx,dy)*1.7;
+    return `M${d.source.x},${d.source.y}A${dr},${dr} 0 0,1 ${d.target.x},${d.target.y}`;});
+  node.attr("transform",d=>`translate(${d.x},${d.y})`);
+});
+
+const zoom=d3.zoom().scaleExtent([.2,4]).on("zoom",e=>gg.attr("transform",e.transform));
+svg.call(zoom);
+
+const modeSel=document.getElementById("mode");
+Object.keys(MODES).forEach(m=>modeSel.add(new Option(m,m)));
+modeSel.onchange=()=>{const m=MODES[modeSel.value];
+  activeClasses.clear();(m.classes||[]).forEach(c=>activeClasses.add(c));
+  focusSet.clear();lastSel=null;
+  document.getElementById("modeTitle").textContent=modeSel.value;
+  document.getElementById("modeDesc").textContent=m.desc;recompute();};
+const repSel=document.getElementById("report");
+repSel.add(new Option("전체 보고서",""));
+nodes.filter(n=>n.cls==="보고서").forEach(n=>repSel.add(new Option(n.label,n.id)));
+repSel.onchange=()=>{reportFocus=repSel.value||null;
+  const n=reportFocus?byId[reportFocus]:null;
+  document.getElementById("repTitle").textContent=n?n.label:"전체 보고서";
+  document.getElementById("repDesc").textContent=n?(REP_DESC[n.label]||(n.label+" 관련 노드를 강조합니다.")):
+    "보고서를 선택하면 해당 발굴조사의 유구·유물과 속성만 강조됩니다.";
+  recompute();};
+
+const searchInput=document.getElementById("search");
+function centerOn(n){if(n.x==null)return;
+  svg.transition().duration(500).call(zoom.transform,d3.zoomIdentity.translate(W/2-n.x,H/2-n.y));}
+function pickNode(n){focusSet.add(n.id);lastSel=n.id;centerOn(n);recompute();}
+function renderSearch(q){
+  const box=document.getElementById("searchRes"); q=(q||"").trim();
+  if(!q){node.classed("match",false);box.innerHTML="";return;}
+  const ql=q.toLowerCase();
+  node.classed("match",n=>n.label.toLowerCase().includes(ql));
+  const matches=nodes.filter(n=>n.label.toLowerCase().includes(ql));
+  box.innerHTML="";
+  if(!matches.length){box.innerHTML='<div class="sres" style="color:var(--faint);cursor:default">검색 결과 없음</div>';return;}
+  matches.slice(0,40).forEach(n=>{
+    const d=document.createElement("div"); d.className="sres";
+    d.innerHTML=`<span class="dot" style="background:${CLASSES[n.cls].hex}"></span><span>${n.label}</span><span class="cl">${n.cls}</span>`;
+    d.onclick=()=>pickNode(n); box.appendChild(d);
+  });
+}
+searchInput.addEventListener("input",e=>renderSearch(e.target.value));
+searchInput.addEventListener("keydown",e=>{if(e.key==="Enter"){
+  const m=nodes.find(n=>n.label.toLowerCase().includes(e.target.value.trim().toLowerCase()));
+  if(m)pickNode(m);}});
+
+const legend=d3.select("#legend");
+Object.entries(CLASSES).forEach(([ko,info])=>{
+  if(!counts[ko])return;
+  const chip=legend.append("div").attr("class","chip").attr("data-cls",ko);
+  chip.append("div").attr("class","dot").style("background",info.hex);
+  const tx=chip.append("div");
+  tx.append("span").attr("class","ko").text(ko);
+  tx.append("span").attr("class","en").text(info.en);
+  chip.append("div").attr("class","ct").text(counts[ko]);
+  chip.on("click",()=>{if(activeClasses.has(ko))activeClasses.delete(ko);else activeClasses.add(ko);recompute();});
+});
+
+function setTier(on){
+  tierOn=on;
+  sim.force("x",d3.forceX(d=>tierOn?(70+(TIER[d.cls]??2)*((W-140)/TN)):W/2).strength(tierOn?.55:.04));
+  sim.force("y",d3.forceY(H/2).strength(tierOn?.10:.04));
+  sim.force("charge",d3.forceManyBody().strength(tierOn?-110:-160));
+  sim.force("link").distance(tierOn?95:60);
+  sim.alpha(.75).restart();
+  drawHeads();
+}
+function drawHeads(){
+  headLayer.selectAll(".tierhead").remove();
+  if(!tierOn)return;
+  TIERLBL.forEach((t,i)=>{
+    headLayer.append("div").attr("class","tierhead")
+      .style("left",(70+i*((W-140)/TN))+"px").style("opacity",1).text(t);
+  });
+}
+document.getElementById("tierBtn").onclick=()=>setTier(!tierOn);
+document.getElementById("recenter").onclick=()=>svg.transition().duration(500).call(zoom.transform,d3.zoomIdentity);
+document.getElementById("clearSel").onclick=()=>{focusSet.clear();lastSel=null;recompute();};
+document.getElementById("resetAll").onclick=()=>{
+  activeClasses.clear();focusSet.clear();lastSel=null;reportFocus=null;tierOn=false;
+  modeSel.value="전체 보기";repSel.value="";
+  document.getElementById("modeTitle").textContent="전체 보기";
+  document.getElementById("modeDesc").textContent=MODES["전체 보기"].desc;
+  document.getElementById("repTitle").textContent="전체 보고서";
+  document.getElementById("repDesc").textContent="보고서를 선택하면 해당 발굴조사의 유구·유물과 속성만 강조됩니다.";
+  searchInput.value="";renderSearch("");
+  setTier(false);svg.transition().duration(500).call(zoom.transform,d3.zoomIdentity);recompute();};
+
+window.addEventListener("resize",()=>{W=center.clientWidth;H=center.clientHeight;
+  svg.attr("viewBox",[0,0,W,H]);sim.force("center",d3.forceCenter(W/2,H/2)).alpha(.3).restart();
+  if(tierOn){setTier(true);}});
+
+document.getElementById("modeDesc").textContent=MODES["전체 보기"].desc;
+document.getElementById("repDesc").textContent="보고서를 선택하면 해당 발굴조사의 유구·유물과 속성만 강조됩니다.";
+recompute();
+</script>
+</body>
+</html>
